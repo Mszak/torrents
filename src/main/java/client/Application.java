@@ -6,6 +6,10 @@ public class Application {
 		
 	public static void main(String[] args) {
 		Shell shell = new Shell();
-		shell.run();
+		try {
+			shell.run();			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

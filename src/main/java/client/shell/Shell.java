@@ -1,5 +1,7 @@
 package client.shell;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 import client.utils.ClientServerProtocol;
@@ -18,7 +20,12 @@ public class Shell {
 		while(true) {
 			String command = sc.nextLine();
 			ServerRequest request = parseCommand(command);
-			ServerResponse response = request.execute();
+			if (request != null) {
+				ServerResponse response = request.execute();
+			}
+			else {
+				System.out.println("Error occured");
+			}
 		}
 	}
 
@@ -27,9 +34,21 @@ public class Shell {
 			return new ServerRequest(ClientServerProtocol.LIST, "");
 		}
 		else {
-			System.err.println("NOT IMPLEMENTED: " + command);
-			return null;
+			if (command.startsWith("put")) {
+				String filename = command.split(" ")[1];
+				if (Files.exists(Paths.get(filename))) {
+					return new ServerRequest(ClientServerProtocol.GET, filename);					
+				}
+			}
+			else if (command.startsWith("get")) {
+				String fileId = command.split(" ")[1];
+				return new ServerRequest(ClientServerProtocol.GET, fileId);
+			}
+			
 		}
+		
+		System.err.println("Bad command: " + command);
+		return null;
 	}
 	
 }
