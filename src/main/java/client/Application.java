@@ -119,22 +119,29 @@ public class Application {
 				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId() + "\n", peerSocket.getOutputStream());
 				BufferedReader reader = new BufferedReader(new InputStreamReader(peerSocket.getInputStream()));
 				String chunks = reader.readLine();
-
+				peerSocket.close();
+				
 				List<Integer> integerChunks = parseToArray(chunks);
 				for (Integer chunkId : integerChunks) {
 					if (!file.containsChunk(chunkId)) {
-						byte[] buffer = null;
+						byte[] buffer = new byte[BaseConfig.CHUNK_SIZE];
+						peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
+						
 						IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
 						IOUtils.read(peerSocket.getInputStream(), buffer);
+						System.out.println(buffer[0] + " " + buffer[1]);
 						file.addChunk(chunkId, ArrayUtils.toObject(buffer));
+						
+						peerSocket.close();
 						break;
 					}
 				}
-				peerSocket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		
+		file.saveFile();
 	}
 
 	private static List<Integer> parseToArray(String chunks) {

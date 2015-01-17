@@ -37,7 +37,8 @@ public class UploadableChunkedFile implements ChunkedFile {
 			raf = new RandomAccessFile(pathToFile.toFile(), "r");
 			raf.seek(chunkId * BaseConfig.CHUNK_SIZE);
 			byte[] result = new byte[BaseConfig.CHUNK_SIZE];
-			raf.read(result, 0, BaseConfig.CHUNK_SIZE);
+			int fileSizeLeft = (int)(raf.length() - chunkId * BaseConfig.CHUNK_SIZE);
+			raf.read(result, 0, Math.min(BaseConfig.CHUNK_SIZE, fileSizeLeft));
 			return result;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
