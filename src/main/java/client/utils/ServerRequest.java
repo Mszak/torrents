@@ -50,9 +50,10 @@ public class ServerRequest {
 				response = reader.readLine();
 				System.out.println("GET2: " + response);
 				listPeers(peerInfo);
-				Application.downloadedFiles.add(
-						new DownloadableChunkedFile(response.split(",")[0], Integer.parseInt(argument), Integer.parseInt(response.split(",")[1])));
-				Application.startDownload(peerInfo);
+				DownloadableChunkedFile fileToDownloadableChunkedFile = 
+						new DownloadableChunkedFile(response.split(",")[0], Integer.parseInt(argument), Integer.parseInt(response.split(",")[1])); 
+				Application.downloadedFiles.add(fileToDownloadableChunkedFile);
+				Application.startDownload(peerInfo, fileToDownloadableChunkedFile);
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();

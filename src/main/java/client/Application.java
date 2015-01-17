@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,8 +29,8 @@ public class Application {
 	private static int clientId = 7;
 		
 	public static void main(String[] args) {
-//		initServerConnection();
-//		initTickTask();
+		initServerConnection();
+		initTickTask();
 		Shell shell = new Shell();
 		try {
 			shell.run();			
@@ -54,7 +55,7 @@ public class Application {
 			System.exit(0);
 		}
 	}
-
+//    put /home/jakub/I.sql
 	private static void initTickTask() {
 		TimerTask tickTask = new TimerTask() {
 			
@@ -89,15 +90,31 @@ public class Application {
 			}
 		};
 		Timer tickTimer = new Timer();
-		tickTimer.schedule(tickTask, 1000, 1000);
+		tickTimer.schedule(tickTask, 1000, 2000);
 	}
 
 	public static int getClientId() {
 		return clientId;
 	}
 
-	public static void startDownload(List<Peer> peerInfo) {
-		// TODO Auto-generated method stub
+	//TODO refactor
+	public static void startDownload(List<Peer> peerInfo, DownloadableChunkedFile file) {
+		Random r = new Random();
+		
+		while (!file.isFileFull()) {
+			int randomPeerIndex = r.nextInt(peerInfo.size());
+			Peer peer = peerInfo.get(randomPeerIndex);
+			
+			try {
+				Socket peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
+				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId(), peerSocket.getOutputStream());
+				String chunks = IOUtils.toString(peerSocket.getInputStream());
+				System.out.println(chunks);
+				peerSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static ChunkedFile getFile(int fileId) {

@@ -39,7 +39,7 @@ public class DownloadHandler {
 					file = Application.getFile(fileId);
 					IOUtils.write(file.getChunk(chunkId), out);
 					break;
-				case "GET_ALL_CHUNKS":
+				case "GET_POSSESSED_CHUNKS":
 					file = Application.getFile(fileId);
 					IOUtils.write(file.getPossessedChunks().toString(), out); //TODO maybe new-line
 					break;
