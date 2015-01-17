@@ -12,7 +12,7 @@ public class ServerProtocolParser {
 		List<FileInfo> result = new ArrayList<FileInfo>();
 		
 		for (String info : response.split(":")) {
-			result.add(new FileInfo(info.split(",")[0], Integer.parseInt(info.split(",")[1]), Integer.parseInt(info.split(",")[2])));
+			result.add(new FileInfo(info.split(",")[0], Integer.parseInt(info.split(",")[1])));
 		}
 		
 		return result;

@@ -6,10 +6,12 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import config.BaseConfig;
 
-public class UploadableChunkedFile {
+public class UploadableChunkedFile implements ChunkedFile {
 	
 	private final Path pathToFile;
 	private final int chunksNumber;
@@ -18,7 +20,7 @@ public class UploadableChunkedFile {
 	public UploadableChunkedFile(String sPathToFile, int fileId) throws IOException {
 		this.fileId = fileId;
 		pathToFile = Paths.get(sPathToFile);
-		if (Files.exists(pathToFile)) {
+		if (!Files.exists(pathToFile)) {
 			throw new FileNotFoundException();
 		}
 		
@@ -56,6 +58,17 @@ public class UploadableChunkedFile {
 
 	public int getFileId() {
 		return fileId;
+	}
+
+	@Override //TODO REFACTOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+	public List<Integer> getPossessedChunks() {
+		List<Integer> result = new ArrayList<Integer>();
+		
+		for (int i = 0; i < chunksNumber; ++i) {
+			result.add(i);
+		}
+		
+		return result;
 	}
 
 }

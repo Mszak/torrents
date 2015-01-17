@@ -17,6 +17,7 @@ public class Shell {
 	
 	public void run() {
 		while(true) {
+			System.out.print("$ ");
 			String command = sc.nextLine();
 			ServerRequest request = parseCommand(command);
 			if (request != null) {
@@ -36,7 +37,7 @@ public class Shell {
 			if (command.startsWith("put")) {
 				String filename = command.split(" ")[1];
 				if (Files.exists(Paths.get(filename))) {
-					return new ServerRequest(ProtocolCommands.GET, filename);					
+					return new ServerRequest(ProtocolCommands.PUT, filename);					
 				}
 			}
 			else if (command.startsWith("get")) {

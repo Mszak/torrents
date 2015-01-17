@@ -1,7 +1,6 @@
 package client.utils;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,10 +45,13 @@ public class ServerRequest {
 				IOUtils.write("GET " + Application.getClientId() + " " + argument, socketOut);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				String response = reader.readLine();
+				System.out.println("GET: " + response);
 				List<Peer> peerInfo = ServerProtocolParser.parsepeerInfo(response);
 				response = reader.readLine();
+				System.out.println("GET2: " + response);
+				listPeers(peerInfo);
 				Application.downloadedFiles.add(
-						new DownloadableChunkedFile(response.split(" ")[0], Integer.parseInt(argument), Integer.parseInt(response.split(" ")[1])));
+						new DownloadableChunkedFile(response.split(",")[0], Integer.parseInt(argument), Integer.parseInt(response.split(",")[1])));
 				Application.startDownload(peerInfo);
 				socket.close();
 			} catch (IOException e) {
@@ -64,6 +66,7 @@ public class ServerRequest {
 				IOUtils.write("LIST", socketOut);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				String response = reader.readLine();
+				System.out.println("LIST: " + response);
 				List<FileInfo> filesOnServer = ServerProtocolParser.parseListResponse(response);
 				printAvailableFiles(filesOnServer);
 				socket.close();
@@ -72,7 +75,7 @@ public class ServerRequest {
 			}
 			break;
 		case PUT:
-			String filename = argument.substring(argument.lastIndexOf(File.pathSeparator));
+			String filename = argument.substring(argument.lastIndexOf("/") + 1);
 			try {
 				Socket socket = new Socket(BaseConfig.SERVER_ADDRESS, BaseConfig.SERVER_PORT);
 				OutputStream socketOut = socket.getOutputStream();
@@ -80,12 +83,19 @@ public class ServerRequest {
 				IOUtils.write("PUT " + Application.getClientId() + " " + filename + " " + FileInfo.getChunkNumbers(argument), socketOut);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				Integer fileId = Integer.parseInt(reader.readLine());
+				System.out.println("PUT: " + fileId);
 				Application.uploadedFiles.add(new UploadableChunkedFile(argument, fileId));
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			break;
+		}
+	}
+
+	private void listPeers(List<Peer> peerInfo) {
+		for (Peer p : peerInfo) {
+			System.out.println(p);
 		}
 	}
 

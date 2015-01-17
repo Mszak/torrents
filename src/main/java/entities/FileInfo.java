@@ -10,12 +10,10 @@ public class FileInfo {
 
 	private final String fileName;
 	private final int fileId;
-	private final int chunksNumber;
 
-	public FileInfo(String fileName, int fileId, int chunksNumber) {
+	public FileInfo(String fileName, int fileId) {
 		this.fileName = fileName;
 		this.fileId = fileId;
-		this.chunksNumber = chunksNumber;
 	}
 
 	public int getFileId() {
@@ -24,10 +22,6 @@ public class FileInfo {
 
 	public String getFileName() {
 		return fileName;
-	}
-	
-	public int getChunksNumber() {
-		return chunksNumber;
 	}
 
 	@Override

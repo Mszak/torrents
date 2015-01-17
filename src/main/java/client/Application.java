@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 
 import client.shell.Shell;
 import config.BaseConfig;
+import entities.ChunkedFile;
 import entities.DownloadableChunkedFile;
 import entities.Peer;
 import entities.UploadableChunkedFile;
@@ -24,11 +25,11 @@ public class Application {
 	public static final List<UploadableChunkedFile> uploadedFiles = new CopyOnWriteArrayList<>();
 	public static final List<DownloadableChunkedFile> downloadedFiles = new CopyOnWriteArrayList<>();
 	
-	private static int clientId;
+	private static int clientId = 7;
 		
 	public static void main(String[] args) {
-		initTickTask();
-		initServerConnection();
+//		initServerConnection();
+//		initTickTask();
 		Shell shell = new Shell();
 		try {
 			shell.run();			
@@ -45,6 +46,7 @@ public class Application {
 			IOUtils.write("REGISTER", socketOut);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 			clientId = Integer.parseInt(reader.readLine());
+			System.out.println(clientId);
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -96,5 +98,21 @@ public class Application {
 
 	public static void startDownload(List<Peer> peerInfo) {
 		// TODO Auto-generated method stub
+	}
+
+	public static ChunkedFile getFile(int fileId) {
+		for (ChunkedFile file : downloadedFiles) {
+			if (file.getFileId() == fileId) {
+				return file;
+			}
+		}
+		
+		for (ChunkedFile file : uploadedFiles) {
+			if (file.getFileId() == fileId) {
+				return file;
+			}
+		}
+		
+		throw new RuntimeException("No file with id: " + fileId);
 	}
 }

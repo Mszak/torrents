@@ -15,8 +15,7 @@ import exceptions.ChunkAlreadyPossesedException;
 import exceptions.ChunkNotFoundException;
 import exceptions.FileNotChunkedException;
 
-//TODO refactor
-public class DownloadableChunkedFile {
+public class DownloadableChunkedFile implements ChunkedFile {
 	
 	private final String filename;
 	private final int fileId;
@@ -92,6 +91,19 @@ public class DownloadableChunkedFile {
 
 	public int getFileId() {
 		return fileId;
+	}
+
+	@Override
+	public List<Integer> getPossessedChunks() {
+		List<Integer> possessedChunks = new ArrayList<Integer>();
+		
+		for (int chunkId = 0; chunkId < chunksNumber; ++chunkId) {
+			if (chunks.containsKey(chunkId)) {
+				possessedChunks.add(chunkId);
+			}
+		}
+		
+		return possessedChunks;
 	}
 
 }
