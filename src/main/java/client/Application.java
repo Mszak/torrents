@@ -114,7 +114,8 @@ public class Application {
 			try {
 				Socket peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
 				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId(), peerSocket.getOutputStream());
-				String chunks = IOUtils.toString(peerSocket.getInputStream());
+				BufferedReader reader = new BufferedReader(new InputStreamReader(peerSocket.getInputStream()));
+				String chunks = reader.readLine();
 				System.out.println(chunks);
 				peerSocket.close();
 			} catch (IOException e) {
