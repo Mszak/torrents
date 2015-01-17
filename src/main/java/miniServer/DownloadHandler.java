@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -41,7 +42,8 @@ public class DownloadHandler {
 					break;
 				case "GET_POSSESSED_CHUNKS":
 					file = Application.getFile(fileId);
-					IOUtils.write(file.getPossessedChunks().toString() + "\n", out); //TODO maybe new-line
+					String chunks = chunksToString(file.getPossessedChunks());
+					IOUtils.write(chunks + "\n", out); //TODO maybe new-line
 					break;
 				default:
 					throw new RuntimeException("No such command");
@@ -51,6 +53,15 @@ public class DownloadHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		private String chunksToString(List<Integer> possessedChunks) {
+			StringBuffer result = new StringBuffer();
+			for(int chunk: possessedChunks) {
+				result.append(chunk + ",");
+			}
+			result.deleteCharAt(result.length() - 1);
+			return result.toString();
 		}
 	}
 

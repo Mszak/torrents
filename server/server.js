@@ -39,7 +39,7 @@ var server = net.createServer(function (socket) {
     });
 
     socket.on('close', function(data){
-       console.log('disconnected');
+       //console.log('disconnected');
     });
 
     socket.on('error', function(data){
