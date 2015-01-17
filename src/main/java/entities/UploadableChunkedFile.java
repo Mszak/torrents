@@ -28,10 +28,9 @@ public class UploadableChunkedFile implements ChunkedFile {
 	}
 	
 	public byte[] getChunk(int chunkId) {
-		if (chunkId < chunksNumber) {
+		if (chunkId >= chunksNumber) {
 			throw new IndexOutOfBoundsException("Chunk to big: " + chunkId);
 		}
-		
 		RandomAccessFile raf = null;
 		try {
 			raf = new RandomAccessFile(pathToFile.toFile(), "r");

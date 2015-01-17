@@ -33,12 +33,12 @@ public class DownloadHandler {
 				String command = reader.readLine();
 				int fileId = Integer.parseInt(command.split(" ")[1]);
 				ChunkedFile file = null;
-				
 				switch (command.split(" ")[0]) {
 				case "GET_CHUNK":
 					int chunkId = Integer.parseInt(command.split(" ")[2]);
 					file = Application.getFile(fileId);
 					IOUtils.write(file.getChunk(chunkId), out);
+
 					break;
 				case "GET_POSSESSED_CHUNKS":
 					file = Application.getFile(fileId);
