@@ -129,7 +129,6 @@ public class Application {
 						
 						IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
 						IOUtils.read(peerSocket.getInputStream(), buffer);
-						System.out.println(buffer[0] + " " + buffer[1]);
 						file.addChunk(chunkId, ArrayUtils.toObject(buffer));
 						
 						peerSocket.close();

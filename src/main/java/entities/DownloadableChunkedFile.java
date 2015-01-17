@@ -80,9 +80,22 @@ public class DownloadableChunkedFile implements ChunkedFile {
 		try {
 			Files.createFile(Paths.get(BaseConfig.DOWNLOAD_DIR + filename));
 			FileOutputStream out = new FileOutputStream(BaseConfig.DOWNLOAD_DIR + filename, true);
-			for (int chunkId = 0; chunkId < chunksNumber; ++chunkId) {
+			for (int chunkId = 0; chunkId < chunksNumber - 1; ++chunkId) {
 				out.write(ArrayUtils.toPrimitive(chunks.get(chunkId)));
 			}
+			
+			int lastByte = -1;
+			Byte[] lastChunk = chunks.get(chunksNumber - 1);
+			for (int i = BaseConfig.CHUNK_SIZE - 1; i >= 0; --i) {
+				if (lastChunk[i] != 0) {
+					lastByte = i + 1;
+					break;
+				}
+			}
+			for (int i = 0; i < lastByte; ++i) {
+				out.write(lastChunk[i]);
+			}
+			
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
