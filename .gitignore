@@ -77,3 +77,4 @@ server/db/*.sqlite3-journal
 server/log/*.log
 server/tmp
 #
+.idea
