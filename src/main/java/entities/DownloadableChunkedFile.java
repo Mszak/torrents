@@ -19,11 +19,13 @@ import exceptions.FileNotChunkedException;
 public class DownloadableChunkedFile {
 	
 	private final String filename;
+	private final int fileId;
 	private final int chunksNumber;
 	private final HashMap<Integer, Byte[]> chunks;
 	
-	public DownloadableChunkedFile(String filename, int chunkNumber) {
+	public DownloadableChunkedFile(String filename, int fileId, int chunkNumber) {
 		this.filename = filename;
+		this.fileId = fileId;
 		this.chunksNumber = chunkNumber;
 		chunks = new HashMap<Integer, Byte[]>();
 	}
@@ -86,6 +88,10 @@ public class DownloadableChunkedFile {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public int getFileId() {
+		return fileId;
 	}
 
 }

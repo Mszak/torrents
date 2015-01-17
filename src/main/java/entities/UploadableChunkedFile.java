@@ -13,8 +13,10 @@ public class UploadableChunkedFile {
 	
 	private final Path pathToFile;
 	private final int chunksNumber;
+	private final int fileId;
 
-	public UploadableChunkedFile(String sPathToFile) throws IOException {
+	public UploadableChunkedFile(String sPathToFile, int fileId) throws IOException {
+		this.fileId = fileId;
 		pathToFile = Paths.get(sPathToFile);
 		if (Files.exists(pathToFile)) {
 			throw new FileNotFoundException();
@@ -50,6 +52,10 @@ public class UploadableChunkedFile {
 				}
 			}
 		}
+	}
+
+	public int getFileId() {
+		return fileId;
 	}
 
 }
