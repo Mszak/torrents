@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import client.shell.Shell;
 import config.BaseConfig;
 import entities.DownloadableChunkedFile;
+import entities.Peer;
 import entities.UploadableChunkedFile;
 
 public class Application {
@@ -91,5 +92,9 @@ public class Application {
 
 	public static int getClientId() {
 		return clientId;
+	}
+
+	public static void startDownload(List<Peer> peerInfo) {
+		// TODO Auto-generated method stub
 	}
 }

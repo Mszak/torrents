@@ -1,6 +1,7 @@
 package client.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,8 +13,10 @@ import org.apache.commons.io.IOUtils;
 
 import client.Application;
 import config.BaseConfig;
+import entities.DownloadableChunkedFile;
 import entities.FileInfo;
 import entities.Peer;
+import entities.UploadableChunkedFile;
 
 public class ServerRequest {
 	
@@ -44,7 +47,10 @@ public class ServerRequest {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				String response = reader.readLine();
 				List<Peer> peerInfo = ServerProtocolParser.parsepeerInfo(response);
-				//TODO start download
+				response = reader.readLine();
+				Application.downloadedFiles.add(
+						new DownloadableChunkedFile(response.split(" ")[0], Integer.parseInt(argument), Integer.parseInt(response.split(" ")[1])));
+				Application.startDownload(peerInfo);
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -66,6 +72,19 @@ public class ServerRequest {
 			}
 			break;
 		case PUT:
+			String filename = argument.substring(argument.lastIndexOf(File.pathSeparator));
+			try {
+				Socket socket = new Socket(BaseConfig.SERVER_ADDRESS, BaseConfig.SERVER_PORT);
+				OutputStream socketOut = socket.getOutputStream();
+				InputStream socketIn = socket.getInputStream();
+				IOUtils.write("PUT " + Application.getClientId() + " " + filename + " " + FileInfo.getChunkNumbers(argument), socketOut);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
+				Integer fileId = Integer.parseInt(reader.readLine());
+				Application.uploadedFiles.add(new UploadableChunkedFile(argument, fileId));
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			break;
 		}
 	}
