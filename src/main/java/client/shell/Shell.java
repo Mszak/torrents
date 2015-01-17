@@ -29,7 +29,7 @@ public class Shell {
 		}
 	}
 
-	private ServerRequest parseCommand(String command) {
+	private ServerRequest parseCommand(String command) { //TODO error handling
 		if (command.startsWith("list")) {
 			return new ServerRequest(ClientServerProtocol.LIST, "");
 		}
