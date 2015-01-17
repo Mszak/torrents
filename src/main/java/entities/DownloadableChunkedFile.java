@@ -105,6 +105,10 @@ public class DownloadableChunkedFile implements ChunkedFile {
 	public int getFileId() {
 		return fileId;
 	}
+	
+	public String getFilename() {
+		return filename;
+	}
 
 	@Override
 	public List<Integer> getPossessedChunks() {

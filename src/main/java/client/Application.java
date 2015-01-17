@@ -141,6 +141,21 @@ public class Application {
 		}
 		
 		file.saveFile();
+		removeDownloadableFile(file.getFileId());
+		try {
+			uploadedFiles.add(new UploadableChunkedFile(BaseConfig.DOWNLOAD_DIR + file.getFilename(), file.getFileId()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void removeDownloadableFile(int fileId) {
+		for (int i = 0; i < downloadedFiles.size(); ++i) {
+			if (downloadedFiles.get(i).getFileId() == fileId) {
+				downloadedFiles.remove(i);
+				break;
+			}
+		}
 	}
 
 	private static List<Integer> parseToArray(String chunks) {
