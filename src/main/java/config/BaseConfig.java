@@ -7,5 +7,5 @@ public interface BaseConfig {
 	public static final int CLIENT_UPLOAD_PORT = 10000;
 	
 	public static final String SERVER_ADDRESS =  "83.22.65.18";
-	public static final int SERVER_PORT = 3000;
+	public static final int SERVER_PORT = 3001;
 }

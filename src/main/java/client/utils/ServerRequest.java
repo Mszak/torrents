@@ -1,27 +1,31 @@
 package client.utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import client.Application;
 import config.BaseConfig;
 import entities.FileInfo;
+import entities.Peer;
 
 public class ServerRequest {
 	
-	private final ClientServerProtocol type;
+	private final ProtocolCommands type;
 	private final String argument;
 	
-	public ServerRequest(ClientServerProtocol type, String argument) {
+	public ServerRequest(ProtocolCommands type, String argument) {
 		this.type = type;
 		this.argument = argument;
 	}
 
-	public ClientServerProtocol getType() {
+	public ProtocolCommands getType() {
 		return type;
 	}
 
@@ -29,9 +33,22 @@ public class ServerRequest {
 		return argument;
 	}
 	
-	public ServerResponse execute() {
+	public void execute() {
 		switch (type) {
 		case GET:
+			try {
+				Socket socket = new Socket(BaseConfig.SERVER_ADDRESS, BaseConfig.SERVER_PORT);
+				OutputStream socketOut = socket.getOutputStream();
+				InputStream socketIn = socket.getInputStream();
+				IOUtils.write("GET " + Application.getClientId() + " " + argument, socketOut);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
+				String response = reader.readLine();
+				List<Peer> peerInfo = ServerProtocolParser.parsepeerInfo(response);
+				//TODO start download
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			break;
 		case LIST:
 			try {
@@ -39,7 +56,8 @@ public class ServerRequest {
 				OutputStream socketOut = socket.getOutputStream();
 				InputStream socketIn = socket.getInputStream();
 				IOUtils.write("LIST", socketOut);
-				String response = IOUtils.toString(socketIn);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
+				String response = reader.readLine();
 				List<FileInfo> filesOnServer = ServerProtocolParser.parseListResponse(response);
 				printAvailableFiles(filesOnServer);
 				socket.close();
@@ -49,13 +67,7 @@ public class ServerRequest {
 			break;
 		case PUT:
 			break;
-		case TICK:
-			break;
-		default:
-			break;
-		
 		}
-		return null; //TODO
 	}
 
 	private void printAvailableFiles(List<FileInfo> filesOnServer) {

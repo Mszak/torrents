@@ -1,6 +1,6 @@
 package client.utils;
 
-public enum ClientServerProtocol {
+public enum ProtocolCommands {
 	LIST {
 		
 	},
@@ -8,9 +8,6 @@ public enum ClientServerProtocol {
 		
 	},
 	GET {
-		
-	},
-	TICK {
 		
 	}
 }
