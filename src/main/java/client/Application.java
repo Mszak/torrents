@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -13,7 +14,9 @@ import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import miniServer.MiniServer;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import client.shell.Shell;
 import config.BaseConfig;
@@ -113,15 +116,35 @@ public class Application {
 			
 			try {
 				Socket peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
-				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId(), peerSocket.getOutputStream());
+				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId() + "\n", peerSocket.getOutputStream());
 				BufferedReader reader = new BufferedReader(new InputStreamReader(peerSocket.getInputStream()));
 				String chunks = reader.readLine();
-				System.out.println(chunks);
+
+				List<Integer> integerChunks = parseToArray(chunks);
+				for (Integer chunkId : integerChunks) {
+					if (!file.containsChunk(chunkId)) {
+						byte[] buffer = null;
+						IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
+						IOUtils.read(peerSocket.getInputStream(), buffer);
+						file.addChunk(chunkId, ArrayUtils.toObject(buffer));
+						break;
+					}
+				}
 				peerSocket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static List<Integer> parseToArray(String chunks) {
+		List<Integer> result = new ArrayList<Integer>();
+		
+		for (String chunkId : chunks.split(",")) {
+			result.add(Integer.parseInt(chunkId));
+		}
+		
+		return result;
 	}
 
 	public static ChunkedFile getFile(int fileId) {

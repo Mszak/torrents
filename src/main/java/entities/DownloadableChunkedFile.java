@@ -106,4 +106,8 @@ public class DownloadableChunkedFile implements ChunkedFile {
 		return possessedChunks;
 	}
 
+	public boolean containsChunk(Integer chunkId) {
+		return chunks.containsKey(chunkId);
+	}
+
 }
