@@ -7,6 +7,7 @@ var ConnectionObject = require('./models/Connection');
 var FileArray = [];
 var PeerArray = [];
 var ConnectionArray = [];
+var TickArray = [];
 var connectionIndex = 7;
 var fileIndex = 0;
 
@@ -26,10 +27,11 @@ var server = net.createServer(function (socket) {
                 socket.write(getFilePeers(raw[1], raw[2]));
                 break;
             case ("PUT") :
+                console.log(raw);
                 socket.write(putFile(raw[1], raw[2], raw[3]));
                 break;
             case ("TICK") :
-                tickFile(raw[1]);
+                tickFile(raw[1], raw[2]);
                 break;
             default :
                 socket.write('UNACCEPTABLE COMMAND\n');
@@ -62,7 +64,7 @@ var server = net.createServer(function (socket) {
         var result = "";
         var tmp;
         for (var i = 0; i < PeerArray.length; i++) {
-            if(PeerArray[i].file_id == id) {
+            if(PeerArray[i].fileId == id) {
                 if(result == "")
                     tmp = PeerArray[i].ip + "," + PeerArray[i].port
                 else
@@ -85,6 +87,7 @@ var server = net.createServer(function (socket) {
 
     var putFile = function(user_id, filename, chunks) {
         var user_ip, port;
+        var d = new Date();
         for (var i = 0; i < ConnectionArray.length; i++) {
             if (ConnectionArray[i].id == user_id) {
                 user_ip = ConnectionArray[i].user_ip;
@@ -93,19 +96,25 @@ var server = net.createServer(function (socket) {
         }
         for (var i = 0; i < FileArray.length; i++) {
             if (FileArray[i].name == filename) {
-                var peer = new PeerObject(user_ip, port, FileArray[i].id);
-                return FileArray[i].id;
+                //to do check if some dumb fuck didnt put same file twice
+                var peer = new PeerObject(user_ip, port, FileArray[i].id, d.getTime(), user_id);
+                return FileArray[i].id.toString() + "\n";
             }
         }
         var file = new FileObject(fileIndex++, filename, chunks);
-        var peer = new PeerObject(user_ip, port, file.id);
+        var peer = new PeerObject(user_ip, port, file.id, d.getTime(), user_id);
         FileArray.push(file);
         PeerArray.push(peer);
         return file.id.toString() + "\n";
     }
 
-    var tickFile = function (id) {
-        return id;
+    var tickFile = function (userId, fileId) {
+        var d = new Date();
+        for (var i = 0; i < PeerArray.length; i++) {
+            if(PeerArray[i].userId == userId && PeerArray[i].fileId == fileId) {
+                PeerArray[i].tickTime = d.getTime();
+            }
+        }
     }
 });
 
@@ -120,5 +129,15 @@ server.on('connection', function(socket){
     socket.write(connection.id.toString() + "\n");
 });
 
+setInterval(function() {
+    var d = new Date();
+    var currTime = d.getTime();
+    for (var i = 0; i < PeerArray.length; i++) {
+        if (currTime - PeerArray[i].tickTime > 6500) {
+            PeerArray.splice(i, 1);
+        }
+
+    }
+}, 7000)
 
 server.listen(3001);

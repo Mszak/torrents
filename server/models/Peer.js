@@ -1,5 +1,7 @@
-module.exports = function Peer(ip, port, file_id){
+module.exports = function Peer(ip, port, fileId, tickTime, userId){
     this.ip = ip;
     this.port = port;
-    this.file_id = file_id;
+    this.fileId = fileId;
+    this.tickTime = tickTime;
+    this.userId = userId;
 };
