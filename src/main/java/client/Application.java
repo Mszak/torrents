@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import miniServer.MiniServer;
 import org.apache.commons.io.IOUtils;
 
 import client.shell.Shell;
@@ -31,12 +32,17 @@ public class Application {
 	public static void main(String[] args) {
 		initServerConnection();
 		initTickTask();
+		initMiniServer();
 		Shell shell = new Shell();
 		try {
 			shell.run();			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void initMiniServer() {
+		new Thread(new MiniServer()).start();
 	}
 
 	private static void initServerConnection() {

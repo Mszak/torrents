@@ -41,7 +41,7 @@ public class DownloadHandler {
 					break;
 				case "GET_POSSESSED_CHUNKS":
 					file = Application.getFile(fileId);
-					IOUtils.write(file.getPossessedChunks().toString(), out); //TODO maybe new-line
+					IOUtils.write(file.getPossessedChunks().toString() + "\n", out); //TODO maybe new-line
 					break;
 				default:
 					throw new RuntimeException("No such command");
