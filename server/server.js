@@ -51,9 +51,9 @@ var server = net.createServer(function (socket) {
         var tmp;
         for (var i = 0; i < FileArray.length; i++) {
             if(i == 0)
-                tmp =  FileArray[i].name + "," + FileArray[i].id
+                tmp =  FileArray[i].name + "," + FileArray[i].id;
             else
-                tmp = ":" + FileArray[i].name + "," + FileArray[i].id
+                tmp = ":" + FileArray[i].name + "," + FileArray[i].id;
             result += tmp;
         }
         result += "\n";
@@ -66,9 +66,9 @@ var server = net.createServer(function (socket) {
         for (var i = 0; i < PeerArray.length; i++) {
             if(PeerArray[i].fileId == id) {
                 if(result == "")
-                    tmp = PeerArray[i].ip + "," + PeerArray[i].port
+                    tmp = PeerArray[i].ip + "," + PeerArray[i].port;
                 else
-                    tmp = ":" + PeerArray[i].ip + "," + PeerArray[i].port
+                    tmp = ":" + PeerArray[i].ip + "," + PeerArray[i].port;
 
                 result += tmp;
             }
@@ -123,7 +123,7 @@ server.on('connection', function(socket){
         if(ConnectionArray[i].user_ip == socket.remoteAddress)
             return;
     }
-    var connection = new ConnectionObject(connectionIndex++, socket.remoteAddress, 10000)
+    var connection = new ConnectionObject(connectionIndex++, socket.remoteAddress, 10000);
     //to do change port (socket.remotePort)
     ConnectionArray.push(connection);
     socket.write(connection.id.toString() + "\n");
@@ -138,6 +138,6 @@ setInterval(function() {
         }
 
     }
-}, 7000)
+}, 7000);
 
 server.listen(3001);
