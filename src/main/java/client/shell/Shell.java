@@ -21,20 +21,21 @@ public class Shell {
 			String command = sc.nextLine();
 			ServerRequest request = parseCommand(command);
 			if (request != null) {
-				request.execute();
-			}
-			else {
-				System.out.println("Error occured");
+				try {
+					request.execute();
+				} catch (Exception e) {
+					System.out.println("Error occured during request handling. Try again.get");
+				}
 			}
 		}
 	}
 
-	private ServerRequest parseCommand(String command) { //TODO error handling
-		if (command.startsWith("list")) {
-			return new ServerRequest(ProtocolCommands.LIST, "");
-		}
-		else {
-			if (command.startsWith("put")) {
+	private ServerRequest parseCommand(String command) {
+		try {
+			if (command.startsWith("list")) {
+				return new ServerRequest(ProtocolCommands.LIST, "");
+			}
+			else if (command.startsWith("put")) {
 				String filename = command.split(" ")[1];
 				if (Files.exists(Paths.get(filename))) {
 					return new ServerRequest(ProtocolCommands.PUT, filename);					
@@ -45,10 +46,12 @@ public class Shell {
 				return new ServerRequest(ProtocolCommands.GET, fileId);
 			}
 			
+			throw new RuntimeException("Parse error.");
+			
+		} catch (Exception e) {
+			System.out.println("Parse error.");
+			return null;
 		}
-		
-		System.err.println("Bad command: " + command);
-		return null;
 	}
 	
 }

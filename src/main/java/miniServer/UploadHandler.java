@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
 import client.Application;
 import entities.ChunkedFile;
 
-public class DownloadHandler {	
+public class UploadHandler {	
 	
 	private static class UploadTask extends Thread {
 		
@@ -43,7 +43,7 @@ public class DownloadHandler {
 				case "GET_POSSESSED_CHUNKS":
 					file = Application.getFile(fileId);
 					String chunks = chunksToString(file.getPossessedChunks());
-					IOUtils.write(chunks + "\n", out); //TODO maybe new-line
+					IOUtils.write(chunks + "\n", out);
 					break;
 				default:
 					throw new RuntimeException("No such command");

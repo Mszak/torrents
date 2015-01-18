@@ -16,7 +16,7 @@ public class MiniServer implements Runnable {
 			
 			while (true) {
 				Socket clientSocket = listenSocket.accept();
-				DownloadHandler.handle(clientSocket);
+				UploadHandler.handle(clientSocket);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

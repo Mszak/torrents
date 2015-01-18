@@ -45,7 +45,9 @@ public class Application {
 	}
 
 	private static void initMiniServer() {
-		new Thread(new MiniServer()).start();
+		Thread miniServerThread = new Thread(new MiniServer());
+		miniServerThread.setDaemon(true);
+		miniServerThread.start();
 	}
 
 	private static void initServerConnection() {
