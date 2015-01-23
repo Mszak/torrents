@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Semaphore;
 
 import miniServer.MiniServer;
 
@@ -22,6 +23,7 @@ import client.shell.Shell;
 import config.BaseConfig;
 import entities.ChunkedFile;
 import entities.DownloadableChunkedFile;
+import entities.LightDownloadableChunkedFile;
 import entities.Peer;
 import entities.UploadableChunkedFile;
 
@@ -29,6 +31,8 @@ public class Application {
 	
 	public static final List<UploadableChunkedFile> uploadedFiles = new CopyOnWriteArrayList<>();
 	public static final List<DownloadableChunkedFile> downloadedFiles = new CopyOnWriteArrayList<>();
+	
+	public static final Semaphore availableDownloads = new Semaphore(BaseConfig.MAX_PARALLEL_DOWNLOADS);
 	
 	private static int clientId = 7;
 		
@@ -149,6 +153,33 @@ public class Application {
 			uploadedFiles.add(new UploadableChunkedFile(BaseConfig.DOWNLOAD_DIR + file.getFilename(), file.getFileId()));
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public static void startDownload(List<Peer> peerInfo, LightDownloadableChunkedFile file) {
+		Random r = new Random();
+		while (!file.isFileFull()) {
+			int randomPeerIndex = r.nextInt(peerInfo.size());
+			Peer peer = peerInfo.get(randomPeerIndex);
+			
+			try {
+				Socket peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
+				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId() + "\n", peerSocket.getOutputStream());
+				BufferedReader reader = new BufferedReader(new InputStreamReader(peerSocket.getInputStream()));
+				String chunks = reader.readLine();
+				peerSocket.close();
+				
+				List<Integer> integerChunks = parseToArray(chunks);
+				for (Integer chunkId : integerChunks) {
+					if (file.reserveChunkToDownload(chunkId)) {
+						availableDownloads.acquire();
+						new DownloadTask(file, peer, chunkId).start();
+						break;
+					}
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

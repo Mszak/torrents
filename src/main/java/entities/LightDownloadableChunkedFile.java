@@ -65,6 +65,10 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		return false;
 	}
 	
+	public void unreserveChunk(int chunkId) {
+		chunkStatuses[chunkId] = ChunkStatus.EMPTY;
+	}
+	
 	@Override
 	public byte[] getChunk(int chunkId) {
 		if (chunkStatuses[chunkId] == ChunkStatus.DOWNLOADED) {
@@ -102,4 +106,13 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		return fileId;
 	}
 	
+	public boolean isFileFull() {
+		for (ChunkStatus c : chunkStatuses) {
+			if (c != ChunkStatus.DOWNLOADED) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }
