@@ -66,7 +66,7 @@ public class Application {
 			System.exit(0);
 		}
 	}
-//    put /home/jakub/I.sql
+	
 	private static void initTickTask() {
 		TimerTask tickTask = new TimerTask() {
 			
@@ -130,7 +130,8 @@ public class Application {
 						peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
 						
 						IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
-						IOUtils.read(peerSocket.getInputStream(), buffer);
+						int readSize = IOUtils.read(peerSocket.getInputStream(), buffer);
+						System.err.println(readSize);
 						file.addChunk(chunkId, ArrayUtils.toObject(buffer));
 						
 						peerSocket.close();
