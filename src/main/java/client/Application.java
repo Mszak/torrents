@@ -102,6 +102,7 @@ public class Application {
 
 			private void tickFile(int fileId) throws IOException {
 				IOUtils.write("TICK " + clientId + " " + fileId, socket.getOutputStream());
+				socket.getOutputStream().flush();
 			}
 		};
 		Timer tickTimer = new Timer();
@@ -135,8 +136,12 @@ public class Application {
 						
 						IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
 						int readSize = IOUtils.read(peerSocket.getInputStream(), buffer);
-						System.err.println(readSize);
-						file.addChunk(chunkId, ArrayUtils.toObject(buffer));
+						
+						byte[] bufferToSave = new byte[readSize];
+						for (int i = 0; i < readSize; ++i) {
+							bufferToSave[i] = buffer[i];
+						}
+						file.addChunk(chunkId, ArrayUtils.toObject(bufferToSave));
 						
 						peerSocket.close();
 						break;
