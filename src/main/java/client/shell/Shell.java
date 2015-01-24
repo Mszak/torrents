@@ -24,6 +24,7 @@ public class Shell {
 				try {
 					request.execute();
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println("Error occured during request handling. Try again.get");
 				}
 			}

@@ -81,7 +81,8 @@ public class ServerRequest {
 				Socket socket = new Socket(BaseConfig.SERVER_ADDRESS, BaseConfig.SERVER_PORT);
 				OutputStream socketOut = socket.getOutputStream();
 				InputStream socketIn = socket.getInputStream();
-				IOUtils.write("PUT " + Application.getClientId() + " " + filename + " " + FileInfo.getChunkNumbers(argument), socketOut);
+				IOUtils.write("PUT " + Application.getClientId() + " " + filename + " " 
+						+ FileInfo.getChunkNumbers(argument) + " " + FileInfo.generateFileSha1(argument), socketOut);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				Integer fileId = Integer.parseInt(reader.readLine());
 				System.out.println("PUT: " + fileId);

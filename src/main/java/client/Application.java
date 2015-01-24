@@ -34,7 +34,7 @@ public class Application {
 	
 	public static final Semaphore availableDownloads = new Semaphore(BaseConfig.MAX_PARALLEL_DOWNLOADS);
 	
-	private static int clientId = 7;
+	private static int clientId;
 		
 	public static void main(String[] args) {
 		initServerConnection();
