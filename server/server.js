@@ -1,143 +1,134 @@
-var net = require('net');
-var FileObject = require('./models/File');
-var PeerObject = require('./models/Peer');
-var ConnectionObject = require('./models/Connection');
+var net = require('net'),
+  File = require('./models/File'),
+  Seeder = require('./models/Seeder'),
+  _ = require('underscore'),
 
 
-var FileArray = [];
-var PeerArray = [];
-var ConnectionArray = [];
-var TickArray = [];
-var connectionIndex = 7;
-var fileIndex = 0;
+  server,
+  sockets = {},
+  socketId = 7,
+  files = [],
+  fileHashes = {},
+  fileId = 0,
+  getSocketKey, getUserId, registerPeer, getList;
 
-var server = net.createServer(function (socket) {
 
-    socket.on('data', function(data){
-        var raw = data.toString().split(" ");
-        var command = raw[0];
+getSocketKey = function (socket) {
+  return socket.remoteAddress;
 
-        switch (command) {
-            case ("REGISTER") :
-                break;
-            case ("LIST") :
-                socket.write(getList());
-                break;
-            case ("GET") :
-                socket.write(getFilePeers(raw[1], raw[2]));
-                break;
-            case ("PUT") :
-                console.log(raw);
-                socket.write(putFile(raw[1], raw[2], raw[3]));
-                break;
-            case ("TICK") :
-                tickFile(raw[1], raw[2]);
-                break;
-            default :
-                socket.write('UNACCEPTABLE COMMAND\n');
-        }
-    });
+  // Storing client port only works with an open socket
+  // return socket.remoteAddress + ':' + socket.remotePort;
+};
 
-    socket.on('close', function(data){
-       //console.log('disconnected');
-    });
+getUserId = function (socket) {
+  return sockets[getSocketKey(socket)];
+};
 
-    socket.on('error', function(data){
-       console.log('error');
-    });
+registerPeer = function (socket) {
+  var key = getSocketKey(socket);
+  if (typeof sockets[key] === 'undefined') {
+    console.log('assigning id', socketId)
+    sockets[key] = socketId++;
+  }
+  return sockets[key];
+};
 
-    var getList = function () {
-        var result = "";
-        var tmp;
-        for (var i = 0; i < FileArray.length; i++) {
-            if(i == 0)
-                tmp =  FileArray[i].name + "," + FileArray[i].id;
-            else
-                tmp = ":" + FileArray[i].name + "," + FileArray[i].id;
-            result += tmp;
-        }
-        result += "\n";
-        return result ;
-    };
+getList = function () {
+  return files.map(function (file) {
+    return file.name + ':' + file.id;
+  }).join(',');
+};
 
-    var getFilePeers = function (userId, id) {
-        var result = "";
-        var tmp;
-        for (var i = 0; i < PeerArray.length; i++) {
-            if(PeerArray[i].fileId == id) {
-                if(result == "")
-                    tmp = PeerArray[i].ip + "," + PeerArray[i].port;
-                else
-                    tmp = ":" + PeerArray[i].ip + "," + PeerArray[i].port;
+server = net.createServer(function (socket) {
+  var validateUserId, putFile, tickFile, getFileSeeders;
 
-                result += tmp;
-            }
-        }
-        result += "\n";
-        for (var i = 0; i < FileArray.length; i++) {
-            if (FileArray[i].id == id) {
-                tmp = FileArray[i].name + "," + FileArray[i].chunks + "\n";
-                result += tmp;
-                break;
-            }
-        }
+  validateUserId = function (userId) {
+    return getUserId(socket) == userId;
+  },
+  putFile = function(userId, fileName, chunksCount, fileHash) {
+    var ip = socket.remoteAddress,
+        port = socket.remotePort,
+        file,
+        seeder;
 
-        return result;
+    if (!validateUserId(userId)) {
+      console.log('VALIDATION ERROR:', socket.remoteAddress, socket.remotePort, getUserId(socket), userId)
+      return 'ERROR: INVALID USER_ID\n';
     }
 
-    var putFile = function(user_id, filename, chunks) {
-        var user_ip, port;
-        var d = new Date();
-        for (var i = 0; i < ConnectionArray.length; i++) {
-            if (ConnectionArray[i].id == user_id) {
-                user_ip = ConnectionArray[i].user_ip;
-                port = ConnectionArray[i].port;
-            }
-        }
-        for (var i = 0; i < FileArray.length; i++) {
-            if (FileArray[i].name == filename) {
-                //to do check if some dumb fuck didnt put same file twice
-                var peer = new PeerObject(user_ip, port, FileArray[i].id, d.getTime(), user_id);
-                return FileArray[i].id.toString() + "\n";
-            }
-        }
-        var file = new FileObject(fileIndex++, filename, chunks);
-        var peer = new PeerObject(user_ip, port, file.id, d.getTime(), user_id);
-        FileArray.push(file);
-        PeerArray.push(peer);
-        return file.id.toString() + "\n";
+    if (typeof fileHashes[fileHash] === 'undefined') {
+      file = new File(fileId++, fileName, chunksCount, fileHash);
+      files[file.id] = file;
+      fileHashes[fileHash] = file.id;
+    } else {
+      file = files[fileHashes[fileHash]];
     }
 
-    var tickFile = function (userId, fileId) {
-        var d = new Date();
-        for (var i = 0; i < PeerArray.length; i++) {
-            if(PeerArray[i].userId == userId && PeerArray[i].fileId == fileId) {
-                PeerArray[i].tickTime = d.getTime();
-            }
-        }
+    seeder = new Seeder(socket.remoteAddress, 10000, Date.now(), userId);
+    file.registerSeeder(seeder);
+
+    console.log('putFile', seeder, file.getSeeders())
+
+    return file.id + '\n';
+  },
+  tickFile = function (userId, fileId) {
+    if (!validateUserId(userId)) return false;
+
+    var file = files[fileId];
+
+    if (file) {
+      file.tickSeeder(userId);
     }
+  },
+  getFileSeeders = function (userId, fileId) {
+    if (!validateUserId(userId)) return false;
+
+    var result = '', file = files[fileId];
+
+    result += file.getSeeders().join(',') + '\n';
+    result += file.name + ',' + file.chunksCount + '\n';
+
+    seeder = new Seeder(socket.remoteAddress, 10000, Date.now(), userId);
+    file.registerSeeder(seeder);
+
+    return result;
+  };
+
+  socket.on('data', function (data){
+    var raw = data.toString().split(" ");
+    var command = raw[0];
+
+    switch (command) {
+      case ("REGISTER") :
+        socket.end(registerPeer(socket) + '\n');
+        break;
+      case ("LIST") :
+        socket.end(getList() + "\n");
+        break;
+      case ("GET") :
+        socket.end(getFileSeeders(raw[1], raw[2]));
+        break;
+      case ("PUT") :
+        socket.end(putFile(raw[1], raw[2], raw[3], raw[4]));
+        break;
+      case ("TICK") :
+        tickFile(raw[1], raw[2]);
+        socket.end();
+        break;
+      default :
+        socket.end('UNACCEPTABLE COMMAND\n');
+    }
+  });
+
+  socket.on('error', function (err) {
+    console.log('SOCKET ERROR:', err);
+  });
 });
 
-server.on('connection', function(socket){
-    for(var i = 0; i < ConnectionArray.length; i++) {
-        if(ConnectionArray[i].user_ip == socket.remoteAddress)
-            return;
-    }
-    var connection = new ConnectionObject(connectionIndex++, socket.remoteAddress, 10000);
-    //to do change port (socket.remotePort)
-    ConnectionArray.push(connection);
-    socket.write(connection.id.toString() + "\n");
-});
+setInterval(function () {
+  files.forEach(function (file) {
+    file.removeDisconnectedSeeders();
+  });
+}, 10 * 1000);
 
-setInterval(function() {
-    var d = new Date();
-    var currTime = d.getTime();
-    for (var i = 0; i < PeerArray.length; i++) {
-        if (currTime - PeerArray[i].tickTime > 6500) {
-            PeerArray.splice(i, 1);
-        }
-
-    }
-}, 7000);
-
-server.listen(3001);
+server.listen(3003);

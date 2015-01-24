@@ -80,3 +80,5 @@ server/tmp
 .idea
 
 DOWNLOADS
+
+server/node_modules
