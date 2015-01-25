@@ -106,6 +106,10 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		return fileId;
 	}
 	
+	public String getFilename() {
+		return filename;
+	}
+	
 	public boolean isFileFull() {
 		for (ChunkStatus c : chunkStatuses) {
 			if (c != ChunkStatus.DOWNLOADED) {

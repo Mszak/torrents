@@ -113,7 +113,7 @@ public class Application {
 		return clientId;
 	}
 
-	//TODO refactor
+	@Deprecated
 	public static void startDownload(List<Peer> peerInfo, DownloadableChunkedFile file) {
 		Random r = new Random();
 		
@@ -163,17 +163,6 @@ public class Application {
 	
 	public static void startDownload(List<Peer> peerInfo, LightDownloadableChunkedFile file) {
 		Random r = new Random();
-
-		TimerTask reloadPeerInfoTask = new TimerTask() {
-			
-			@Override
-			public void run() {
-				//TODO: Fetch the latest list of seeders
-			}
-		};
-		
-		Timer reloadPeerInfoTimer = new Timer(true);
-		reloadPeerInfoTimer.schedule(reloadPeerInfoTask, BaseConfig.RELOAD_PEER_INFO_PERIOD, BaseConfig.RELOAD_PEER_INFO_PERIOD);
 		
 		while (!file.isFileFull()) {
 			int randomPeerIndex = r.nextInt(peerInfo.size());
@@ -198,10 +187,13 @@ public class Application {
 				e.printStackTrace();
 			}
 		}
-		
-		reloadPeerInfoTimer.cancel();
-		
-		//TODO Move downloaded file to uploadable files
+				
+		removeDownloadableFile(file.getFileId());
+		try {
+			uploadedFiles.add(new UploadableChunkedFile(BaseConfig.DOWNLOAD_DIR + file.getFilename(), file.getFileId()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void removeDownloadableFile(int fileId) {

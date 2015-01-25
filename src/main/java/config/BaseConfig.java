@@ -10,6 +10,6 @@ public interface BaseConfig {
 	public static final int CLIENT_UPLOAD_PORT = 10000;
 	
 //	public static final String SERVER_ADDRESS =  "83.22.65.18";
-	public static final String SERVER_ADDRESS =  "77.254.156.72";
+	public static final String SERVER_ADDRESS =  "178.37.116.165";
 	public static final int SERVER_PORT = 3003;
 }
