@@ -66,7 +66,10 @@ public class ServerRequest {
 				IOUtils.write("LIST", socketOut);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socketIn));
 				String response = reader.readLine();
-				System.out.println("LIST: " + response);
+				if (response.length() == 0) {
+					break;
+				}
+				System.out.println("LIST: [" + response + "]");
 				List<FileInfo> filesOnServer = ServerProtocolParser.parseListResponse(response);
 				printAvailableFiles(filesOnServer);
 				socket.close();
