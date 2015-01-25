@@ -187,13 +187,6 @@ public class Application {
 				e.printStackTrace();
 			}
 		}
-				
-		removeDownloadableFile(file.getFileId());
-		try {
-			uploadedFiles.add(new UploadableChunkedFile(BaseConfig.DOWNLOAD_DIR + file.getFilename(), file.getFileId()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private static void removeDownloadableFile(int fileId) {
