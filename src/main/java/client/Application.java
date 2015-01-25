@@ -30,7 +30,7 @@ import entities.UploadableChunkedFile;
 public class Application {
 	
 	public static final List<UploadableChunkedFile> uploadedFiles = new CopyOnWriteArrayList<>();
-	public static final List<DownloadableChunkedFile> downloadedFiles = new CopyOnWriteArrayList<>();
+	public static final List<LightDownloadableChunkedFile> downloadedFiles = new CopyOnWriteArrayList<>();
 	
 	public static final Semaphore availableDownloads = new Semaphore(BaseConfig.MAX_PARALLEL_DOWNLOADS);
 	
@@ -83,7 +83,7 @@ public class Application {
 					for (UploadableChunkedFile file : uploadedFiles) {
 						tickFile(file.getFileId());
 					}
-					for (DownloadableChunkedFile file : downloadedFiles) {
+					for (LightDownloadableChunkedFile file : downloadedFiles) {
 						tickFile(file.getFileId());
 					}
 				} catch (IOException e) {
@@ -158,6 +158,18 @@ public class Application {
 	
 	public static void startDownload(List<Peer> peerInfo, LightDownloadableChunkedFile file) {
 		Random r = new Random();
+
+		TimerTask reloadPeerInfoTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+				//TODO: Fetch the latest list of seeders
+			}
+		};
+		
+		Timer reloadPeerInfoTimer = new Timer(true);
+		reloadPeerInfoTimer.schedule(reloadPeerInfoTask, BaseConfig.RELOAD_PEER_INFO_PERIOD, BaseConfig.RELOAD_PEER_INFO_PERIOD);
+		
 		while (!file.isFileFull()) {
 			int randomPeerIndex = r.nextInt(peerInfo.size());
 			Peer peer = peerInfo.get(randomPeerIndex);
@@ -181,6 +193,10 @@ public class Application {
 				e.printStackTrace();
 			}
 		}
+		
+		reloadPeerInfoTimer.cancel();
+		
+		//TODO Move downloaded file to uploadable files
 	}
 
 	private static void removeDownloadableFile(int fileId) {

@@ -12,8 +12,8 @@ import org.apache.commons.io.IOUtils;
 
 import client.Application;
 import config.BaseConfig;
-import entities.DownloadableChunkedFile;
 import entities.FileInfo;
+import entities.LightDownloadableChunkedFile;
 import entities.Peer;
 import entities.UploadableChunkedFile;
 
@@ -50,8 +50,7 @@ public class ServerRequest {
 				response = reader.readLine();
 				System.out.println("GET2: " + response);
 				listPeers(peerInfo);
-				DownloadableChunkedFile fileToDownloadableChunkedFile = 
-						new DownloadableChunkedFile(response.split(",")[0], Integer.parseInt(argument), Integer.parseInt(response.split(",")[1])); 
+				LightDownloadableChunkedFile fileToDownloadableChunkedFile = new LightDownloadableChunkedFile(response.split(",")[0], Integer.parseInt(argument), Integer.parseInt(response.split(",")[1]));
 				Application.downloadedFiles.add(fileToDownloadableChunkedFile);
 				Application.startDownload(peerInfo, fileToDownloadableChunkedFile);
 				socket.close();

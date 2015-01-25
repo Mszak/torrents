@@ -5,6 +5,8 @@ public interface BaseConfig {
 	public static final int CHUNK_SIZE = 10 * 1024; //in bytes
 	public static final int MAX_PARALLEL_DOWNLOADS = 5;
 	
+	public static final int RELOAD_PEER_INFO_PERIOD = 10 * 1000;
+	
 	public static final int CLIENT_UPLOAD_PORT = 10000;
 	
 //	public static final String SERVER_ADDRESS =  "83.22.65.18";

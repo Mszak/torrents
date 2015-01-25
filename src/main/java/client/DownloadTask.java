@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -31,6 +32,9 @@ public class DownloadTask extends Thread {
 			IOUtils.write("GET_CHUNK " + file.getFileId() + " " + chunkId + "\n", peerSocket.getOutputStream());
 			int readSize = IOUtils.read(peerSocket.getInputStream(), buffer);
 			System.err.println(readSize);
+			if (readSize < BaseConfig.CHUNK_SIZE) {
+				buffer = Arrays.copyOf(buffer, readSize);
+			}
 			file.addChunk(chunkId, ArrayUtils.toObject(buffer)); //TODO saving last chunk
 		} catch (IOException e) {
 			file.unreserveChunk(chunkId);
