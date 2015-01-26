@@ -10,10 +10,18 @@ public class Peer {
 		this.port = port;
 	}
 
+	/**
+	 * Zwraca adres IP peera
+	 * @return
+	 */
 	public String getIpAddress() {
 		return ipAddress;
 	}
 
+	/**
+	 * Zwraca numer portu, na którym nasłuchuje peer
+	 * @return
+	 */
 	public int getPort() {
 		return port;
 	}

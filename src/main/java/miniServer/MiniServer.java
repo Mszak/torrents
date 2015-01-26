@@ -8,6 +8,10 @@ import config.BaseConfig;
 
 public class MiniServer implements Runnable {
 
+	/**
+	 * Otwiera socketa na porcie BaseConfig.CLIENT_UPLOAD_PORT
+	 * do komunikacji z innymi peerami
+	 */
 	@Override
 	public void run() {
 		ServerSocket listenSocket = null;

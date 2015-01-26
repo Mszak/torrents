@@ -15,6 +15,7 @@ import exceptions.ChunkAlreadyPossesedException;
 import exceptions.ChunkNotFoundException;
 import exceptions.FileNotChunkedException;
 
+@Deprecated
 public class DownloadableChunkedFile implements ChunkedFile {
 	
 	private final String filename;

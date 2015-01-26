@@ -15,6 +15,9 @@ public class Shell {
 		sc = new Scanner(System.in);
 	}
 	
+	/**
+	 * Rozpoczącie shella
+	 */
 	public void run() {
 		while(true) {
 			System.out.print("$ ");

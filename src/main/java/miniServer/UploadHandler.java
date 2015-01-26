@@ -65,6 +65,10 @@ public class UploadHandler {
 		}
 	}
 
+	/**
+	 * Rozpoczyna nowy wątek do obsługi zapytań od innych peerów
+	 * @param socket
+	 */
 	public static void handle(Socket socket) {
 		System.out.println("Handling download chunk request");
 		new UploadTask(socket).start();

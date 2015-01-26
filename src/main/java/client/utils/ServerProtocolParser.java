@@ -8,6 +8,9 @@ import entities.Peer;
 
 public class ServerProtocolParser {
 
+	/**
+	 * Metoda zwraca listę informacji o plikach po sparsowaniu odpowiedzi z serwera
+	 */
 	public static List<FileInfo> parseListResponse(String response) {
 		List<FileInfo> result = new ArrayList<FileInfo>();
 		
@@ -18,6 +21,9 @@ public class ServerProtocolParser {
 		return result;
 	}
 
+	/**
+	 * Metoda zwraca listę peerów po sparsowaniu odpowiedzi z serwera
+	 */
 	public static List<Peer> parsepeerInfo(String response) {
 		List<Peer> result = new ArrayList<>();
 

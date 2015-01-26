@@ -40,6 +40,11 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		Arrays.fill(chunkStatuses, ChunkStatus.EMPTY);
 	}
 	
+	/**
+	 * Dopisuje do pliku chunk (fileBytes) o numerze chunkId
+	 * @param chunkId
+	 * @param fileBytes
+	 */
 	synchronized public void addChunk(int chunkId, Byte[] fileBytes) {
 		if (chunkStatuses[chunkId] == ChunkStatus.DOWNLOAD_IN_PROGRESS) {
 			chunkStatuses[chunkId] = ChunkStatus.DOWNLOADED;
@@ -56,6 +61,11 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		}
 	}
 	
+	/**
+	 * Rezerwuje chunk o numerze chunkId do zapisu
+	 * @param chunkId
+	 * @return
+	 */
 	synchronized public boolean reserveChunkToDownload(int chunkId) {
 		if (chunkStatuses[chunkId] == ChunkStatus.EMPTY) {
 			chunkStatuses[chunkId] = ChunkStatus.DOWNLOAD_IN_PROGRESS;
@@ -65,10 +75,17 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		return false;
 	}
 	
+	/**
+	 * Zwalnia rezerwację do zapisu dla chunku o numerze chunkId
+	 * @param chunkId
+	 */
 	public void unreserveChunk(int chunkId) {
 		chunkStatuses[chunkId] = ChunkStatus.EMPTY;
 	}
 	
+	/**
+	 * Zwraca tablicę bajtów odpowiadającą chunkowi o numerze chunkId
+	 */
 	@Override
 	public byte[] getChunk(int chunkId) {
 		if (chunkStatuses[chunkId] == ChunkStatus.DOWNLOADED) {
@@ -88,6 +105,9 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		throw new ChunkNotFoundException("File: " + filename + ", chunkId: " + chunkId);
 	}
 
+	/**
+	 * Zwraca listę numerów posiadanych chunków
+	 */
 	@Override
 	public List<Integer> getPossessedChunks() {
 		List<Integer> possessedChunks = new ArrayList<Integer>();
@@ -101,15 +121,26 @@ public class LightDownloadableChunkedFile implements ChunkedFile {
 		return possessedChunks;
 	}
 
+	/**
+	 * Zwraca id pliku
+	 */
 	@Override
 	public int getFileId() {
 		return fileId;
 	}
 	
+	/**
+	 * Zwraca nazwę pliku
+	 * @return
+	 */
 	public String getFilename() {
 		return filename;
 	}
 	
+	/**
+	 * Sprawdza czy plik został pobrany w całości
+	 * @return
+	 */
 	public boolean isFileFull() {
 		for (ChunkStatus c : chunkStatuses) {
 			if (c != ChunkStatus.DOWNLOADED) {

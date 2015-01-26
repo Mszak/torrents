@@ -21,10 +21,16 @@ public class FileInfo {
 		this.fileId = fileId;
 	}
 
+	/**
+	 * Zwraca id pliku
+	 */
 	public int getFileId() {
 		return fileId;
 	}
 
+	/**
+	 * Zwraca nazwę pliku
+	 */
 	public String getFileName() {
 		return fileName;
 	}
@@ -34,10 +40,18 @@ public class FileInfo {
 		return "File name: " + fileName + ", file id: " + fileId;
 	}
 	
+	/**
+	 * Zwraca liczbę chunków, z których składa się plik o ścieżce file
+	 * @throws IOException
+	 */
 	public static int getChunkNumbers(String file) throws IOException {
 		return (int)Math.ceil((double)Files.size(Paths.get(file)) / BaseConfig.CHUNK_SIZE);
 	}
 	
+	/**
+	 * Generuje hash SHA-1 dla pliku file
+	 * @throws IOException
+	 */
 	public static String generateFileSha1(String file) throws IOException {
 		MessageDigest digest;
 		try {

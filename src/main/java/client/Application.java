@@ -112,6 +112,9 @@ public class Application {
 		tickTimer.schedule(tickTask, 1000, 2000);
 	}
 
+	/**
+	 * Zwraca aktualne id klienta
+	 */
 	public static int getClientId() {
 		return clientId;
 	}
@@ -164,6 +167,11 @@ public class Application {
 		}
 	}
 	
+	/**
+	 * Rozpoczyna pobieranie pliku (file), przy wykorzystaniu listy dostępnych seederów (peerInfo)
+	 * @param peerInfo lista z informacjami o peerach posiadających plik
+	 * @param file informacje o pliku do pobrania
+	 */
 	public static void startDownload(List<Peer> peerInfo, LightDownloadableChunkedFile file) {
 		Random r = new Random();
 		
@@ -218,6 +226,10 @@ public class Application {
 		return result;
 	}
 
+	/**
+	 * Zwraca plik typu ChunkedFile o identyfikatorze fileId
+	 * @param fileId id pliku
+	 */
 	public static ChunkedFile getFile(int fileId) {
 		for (ChunkedFile file : downloadedFiles) {
 			if (file.getFileId() == fileId) {

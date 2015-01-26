@@ -27,6 +27,9 @@ public class UploadableChunkedFile implements ChunkedFile {
 		chunksNumber = (int)Math.ceil((double)Files.size(pathToFile) / BaseConfig.CHUNK_SIZE);
 	}
 	
+	/**
+	 * Zwraca tablicę bajtów odpowiadającą chunkowi o numerze chunkId
+	 */
 	public byte[] getChunk(int chunkId) {
 		if (chunkId >= chunksNumber) {
 			throw new IndexOutOfBoundsException("Chunk to big: " + chunkId);
@@ -56,6 +59,9 @@ public class UploadableChunkedFile implements ChunkedFile {
 		}
 	}
 
+	/**
+	 * Zwraca id pliku
+	 */
 	public int getFileId() {
 		return fileId;
 	}

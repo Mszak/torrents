@@ -27,14 +27,23 @@ public class ServerRequest {
 		this.argument = argument;
 	}
 
+	/**
+	 * Zwraca komendę dla tego requestu do serwera
+	 */
 	public ProtocolCommands getType() {
 		return type;
 	}
 
+	/**
+	 * Zwraca parametr przekazywany w request'cie do serwera
+	 */
 	public String getArgument() {
 		return argument;
 	}
 	
+	/**
+	 * Wykonanie requestu do serwera
+	 */
 	public void execute() {
 		switch (type) {
 		case GET:
