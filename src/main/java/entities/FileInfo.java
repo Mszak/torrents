@@ -29,7 +29,7 @@ public class FileInfo {
 	}
 
 	/**
-	 * Zwraca nazwę pliku
+	 * 返回文件名
 	 */
 	public String getFileName() {
 		return fileName;
