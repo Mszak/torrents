@@ -12,4 +12,5 @@ public interface BaseConfig {
 //	public static final String SERVER_ADDRESS =  "83.22.65.18";
 	public static final String SERVER_ADDRESS =  "178.37.116.165";
 	public static final int SERVER_PORT = 3003;
+	public static final int PEER_SOCKET_TIMEOUT = 10000;
 }

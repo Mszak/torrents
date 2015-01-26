@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -169,7 +172,14 @@ public class Application {
 			Peer peer = peerInfo.get(randomPeerIndex);
 			
 			try {
-				Socket peerSocket = new Socket(peer.getIpAddress(), peer.getPort());
+				SocketAddress peerAddress = new InetSocketAddress(peer.getIpAddress(), peer.getPort());
+				Socket peerSocket = new Socket();
+				try {
+					peerSocket.connect(peerAddress, BaseConfig.PEER_SOCKET_TIMEOUT);					
+				} catch (SocketTimeoutException e){
+					peerSocket.close();
+					throw new IOException();
+				}
 				IOUtils.write("GET_POSSESSED_CHUNKS " + file.getFileId() + "\n", peerSocket.getOutputStream());
 				BufferedReader reader = new BufferedReader(new InputStreamReader(peerSocket.getInputStream()));
 				String chunks = reader.readLine();
